@@ -12,9 +12,15 @@ DEFINITION_CLASS = "L1jWkf h3TRxf"
 ALL_CLASS = "Ap5OSd"
 
 
-COLORS = ['\033[1;31m', '\033[1;32m']
-TITLE_COLOR = '\033[1;35m'
-RESET_COLOR = '\033[0m'
+class COLORS:
+    RED = '\033[31;1m'
+    GREEN = '\033[32;1m'
+    BLUE = '\033[34;1m'
+    MAGENTA = '\033[35;1m'
+    CYAN = '\033[36;1m'
+    RESET = '\033[0m'
+    GREEN_SHADE1 = '\033[38;5;22;1m'
+    GREEN_SHADE2 = '\033[38;5;28;1m'
 
 
 class Definition:
@@ -42,10 +48,21 @@ class Definition:
         self.synonyms = synonyms_text.split(": ")[1].split(", ")
 
     def __str__(self):
-        return f"Meaning: {self.meaning}\nExample: {self.example}"
+        res = ""
+        res += f"{COLORS.CYAN}{self.meaning}{COLORS.RESET}\n"
+        if self.example != "":
+            res += f"{COLORS.BLUE}{self.example}{COLORS.RESET}\n"
+        if len(self.synonyms) > 0:
+            res += f"{COLORS.MAGENTA}Synonyms{COLORS.MAGENTA}:\n"
+            for i, syn in enumerate(self.synonyms[:min(3, len(self.synonyms))]):
+                color = COLORS.GREEN_SHADE1
+                if i%2 == 1:
+                    color = COLORS.GREEN_SHADE2
+                res += f"\t{color}{syn}{COLORS.RESET}\n"
+        return res
 
     def __repr__(self):
-        return f"Meaning: {self.meaning}\nExample: {self.example}\nSynonyms: {self.synonyms}"
+        return str(self)
 
 class Section:
     definition_list = None
@@ -73,8 +90,10 @@ class Section:
         self.definition_list.append(definition)
 
     def __repr__(self) -> str:
-        return f"Type: {self.title}\nDefinitions:\n{self.definition_list}"
-
+        res = f"{COLORS.MAGENTA}{self.title}{COLORS.RESET}"
+        for definition in self.definition_list:
+            res += str(definition)
+        return res
 def get_meanings(soup):
     section_attributes = {"jsname": SECTION_JSNAME}
     sections = soup.find_all("div", attrs=section_attributes)
@@ -92,7 +111,7 @@ def get_meanings_flat(soup):
     if len(sugg) != 0:
         fixs = sugg[0].find_all("i")
         spelling_error = True
-        print(" ".join([fix.text for fix in fixs]))
+        print(f"{COLORS.RED}{' '.join([fix.text for fix in fixs])}{COLORS.RESET}")
     main_div_attrs = {"class": "ZINbbc xpd O9g5cc uUPGi"}
     texts_attrs = {"class": ALL_CLASS}
     inner_attrs = {"class": "BNeawe s3v9rd AP7Wnd"}
