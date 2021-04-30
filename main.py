@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import sys
 import requests
+from cli_colors import *
 from bs4 import BeautifulSoup
 
 
@@ -28,16 +29,16 @@ class Definition:
 
     def __str__(self):
         res = ""
-        res += f"{COLORS.CYAN}{self.meaning}{COLORS.RESET}\n"
+        res += f"{color_str(self.meaning, CYAN, MOD_BOLD)}\n"
         if self.example != "":
-            res += f"{COLORS.BLUE}{self.example}{COLORS.RESET}\n"
+            res += f"{color_str(self.example, BLUE)}\n"
         if len(self.synonyms) > 0:
-            res += f"{COLORS.MAGENTA}Synonyms{COLORS.MAGENTA}:\n"
+            res += f"{color_str('Synonyms:', MAGENTA, MOD_BOLD)}\n"
             for i, syn in enumerate(self.synonyms[:min(3, len(self.synonyms))]):
-                color = COLORS.GREEN_SHADE1
+                color = GREEN_SHADE1
                 if i%2 == 1:
-                    color = COLORS.GREEN_SHADE2
-                res += f"\t{color}{syn}{COLORS.RESET}\n"
+                    color = GREEN_SHADE2
+                res += f"\t{color_str(syn, color)}\n"
         return res
 
     def __repr__(self):
@@ -67,9 +68,9 @@ def get_meanings(soup):
     sugg = soup.find_all("a", attrs=spelling_attrs)
     spelling_error = False
     if len(sugg) != 0:
-        fixs = sugg[0].find_all("i")
+        fixes = sugg[0].find_all("i")
         spelling_error = True
-        print(f"{COLORS.RED}{' '.join([fix.text for fix in fixs])}{COLORS.RESET}")
+        color_print(' '.join([fix.text for fix in fixes]), RED, MOD_BOLD, MOD_SLOW_BLINK)
     main_div_attrs = {"class": "ZINbbc xpd O9g5cc uUPGi"}
     texts_attrs = {"class": ALL_CLASS}
     inner_attrs = {"class": "BNeawe s3v9rd AP7Wnd"}

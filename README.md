@@ -3,7 +3,8 @@
 A tool to get the meaning of a word from [Google](https://www.google.com) inside the terminal
 
 ## Libraries
-* [Beautiful Soup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+* [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
+* [cli_colors](https://github.com/sudo-Smiley/cli_colors)
 
 ## How to
 python3 main.py [word]
