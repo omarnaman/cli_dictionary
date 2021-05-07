@@ -45,7 +45,7 @@ class Section:
         self.definition_list.append(definition)
 
     def __repr__(self) -> str:
-        res = f"{COLORS.MAGENTA}{self.title}{COLORS.RESET}"
+        res = color_str(self.title, MAGENTA, MOD_BOLD)
         for definition in self.definition_list:
             res += str(definition)
         return res
