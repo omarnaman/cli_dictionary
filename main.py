@@ -2,21 +2,11 @@
 import sys
 import requests
 from cli_colors import *
+import argparse
 from bs4 import BeautifulSoup
 
 
 ALL_CLASS = "Ap5OSd"
-
-
-class COLORS:
-    RED = '\033[31;1m'
-    GREEN = '\033[32;1m'
-    BLUE = '\033[34;1m'
-    MAGENTA = '\033[35;1m'
-    CYAN = '\033[36;1m'
-    RESET = '\033[0m'
-    GREEN_SHADE1 = '\033[38;5;22;1m'
-    GREEN_SHADE2 = '\033[38;5;28;1m'
 
 
 class Definition:
@@ -56,7 +46,7 @@ class Section:
         self.definition_list.append(definition)
 
     def __repr__(self) -> str:
-        res = f"{COLORS.MAGENTA}{self.title}{COLORS.RESET}"
+        res = color_str(self.title, MAGENTA, MOD_BOLD)
         for definition in self.definition_list:
             res += str(definition)
         return res
@@ -98,6 +88,8 @@ def get_meanings(soup):
             temp_def = None
         elif num_words > 1: # Meaning or Example
             if text.startswith("\"") and text.endswith("\"") or text.startswith("'") and text.endswith("'"):
+                if temp_def is None:
+                    temp_def = Definition()
                 temp_def.example = text
             elif text.startswith("synonyms:"):
                 temp_def.add_synonyms(text)
@@ -119,18 +111,47 @@ def get_html_soup(url):
     soup = BeautifulSoup(html_text, 'html.parser')
     return soup
 
-def print_word_meaning(word):
+def play_audio(soup: BeautifulSoup):
+    audio = soup.find_all("audio")
+    if len(audio) == 0:
+        color_print("No audio found", YELLOW)
+        return
+    audio = audio[0]
+    
+    src = audio["src"]
+    import tempfile
+    import subprocess
+    from shutil import which
+    audio_file = requests.get(src).content
+    if which("ffplay") is None:
+        print(f"{color_str('`ffplay`', RED, MOD_BOLD)} {color_str('not found', RED)}")
+        return
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(audio_file)
+        cmd = f"ffplay {f.name} -autoexit -nodisp -volume 5 -loglevel -8".split()
+        subprocess.run(cmd)
+
+def print_word_meaning(word, audio):
     url = f"https://www.google.com/search?client=firefox-b-d&q=define+{word}"
     soup = get_html_soup(url)
     get_meanings(soup)
+    if audio:
+        play_audio(soup)
 
-def main(word):
-    print_word_meaning(word)
+def main(word, audio=False):
+    print_word_meaning(word, audio)
 
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("word", help="The word that needs defining")
+    parser.add_argument("-a", "--audio", action="store_true")
+    args = parser.parse_args()
+    return args
 
 if __name__=="__main__":
+    
     if len(sys.argv) < 2:
         print("missing word\n")
         exit(1)
-
-    main(sys.argv[1])
+    args = get_args()
+    main(args.word, args.audio)
