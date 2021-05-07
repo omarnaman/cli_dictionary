@@ -2,6 +2,7 @@
 import sys
 import requests
 from cli_colors import *
+import argparse
 from bs4 import BeautifulSoup
 
 
@@ -120,24 +121,37 @@ def play_audio(soup: BeautifulSoup):
     src = audio["src"]
     import tempfile
     import subprocess
+    from shutil import which
     audio_file = requests.get(src).content
+    if which("ffplay") is None:
+        print(f"{color_str('`ffplay`', RED, MOD_BOLD)} {color_str('not found', RED)}")
+        return
     with tempfile.NamedTemporaryFile() as f:
         f.write(audio_file)
         cmd = f"ffplay {f.name} -autoexit -nodisp -volume 5 -loglevel -8".split()
         subprocess.run(cmd)
 
-def print_word_meaning(word):
+def print_word_meaning(word, audio):
     url = f"https://www.google.com/search?client=firefox-b-d&q=define+{word}"
     soup = get_html_soup(url)
     get_meanings(soup)
+    if audio:
+        play_audio(soup)
 
-def main(word):
-    print_word_meaning(word)
+def main(word, audio=False):
+    print_word_meaning(word, audio)
 
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("word", help="The word that needs defining")
+    parser.add_argument("-a", "--audio", action="store_true")
+    args = parser.parse_args()
+    return args
 
 if __name__=="__main__":
+    
     if len(sys.argv) < 2:
         print("missing word\n")
         exit(1)
-
-    main(sys.argv[1])
+    args = get_args()
+    main(args.word, args.audio)
