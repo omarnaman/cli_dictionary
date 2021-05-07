@@ -98,6 +98,8 @@ def get_meanings(soup):
             temp_def = None
         elif num_words > 1: # Meaning or Example
             if text.startswith("\"") and text.endswith("\"") or text.startswith("'") and text.endswith("'"):
+                if temp_def is None:
+                    temp_def = Definition()
                 temp_def.example = text
             elif text.startswith("synonyms:"):
                 temp_def.add_synonyms(text)
