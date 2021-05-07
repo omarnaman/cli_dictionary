@@ -110,6 +110,22 @@ def get_html_soup(url):
     soup = BeautifulSoup(html_text, 'html.parser')
     return soup
 
+def play_audio(soup: BeautifulSoup):
+    audio = soup.find_all("audio")
+    if len(audio) == 0:
+        color_print("No audio found", YELLOW)
+        return
+    audio = audio[0]
+    
+    src = audio["src"]
+    import tempfile
+    import subprocess
+    audio_file = requests.get(src).content
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(audio_file)
+        cmd = f"ffplay {f.name} -autoexit -nodisp -volume 5 -loglevel -8".split()
+        subprocess.run(cmd)
+
 def print_word_meaning(word):
     url = f"https://www.google.com/search?client=firefox-b-d&q=define+{word}"
     soup = get_html_soup(url)
