@@ -8,17 +8,6 @@ from bs4 import BeautifulSoup
 ALL_CLASS = "Ap5OSd"
 
 
-class COLORS:
-    RED = '\033[31;1m'
-    GREEN = '\033[32;1m'
-    BLUE = '\033[34;1m'
-    MAGENTA = '\033[35;1m'
-    CYAN = '\033[36;1m'
-    RESET = '\033[0m'
-    GREEN_SHADE1 = '\033[38;5;22;1m'
-    GREEN_SHADE2 = '\033[38;5;28;1m'
-
-
 class Definition:
     meaning = ""
     example = ""
