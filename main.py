@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 
 ALL_CLASS = "Ap5OSd"
+ALL_CLASS = "Ey4n2"
 
 
 class Definition:
